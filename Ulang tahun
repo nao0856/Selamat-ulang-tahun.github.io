@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Selamat Ulang Tahun</title>
+<style>
+  :root {
+    --bg-color: #fafafa;
+    --text-color: #333;
+    --cake-bg: #bbb;
+    --cake-hover-bg: #999;
+  }
+  body {
+    margin:0;
+    padding: 30px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+  }
+  h1 {
+    margin-bottom: 5px;
+    letter-spacing: 0.1em;
+  }
+  #game-area {
+    position: relative;
+    margin-top: 40px;
+    width: 280px;
+    height: 280px;
+    border: 2px solid var(--text-color);
+    border-radius: 12px;
+    background: #eee;
+    overflow: hidden;
+  }
+  #cake {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-color: var(--cake-bg);
+    border-radius: 15px;
+    font-size: 50px;
+    line-height: 80px;
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.5s ease;
+    top: 100px;
+    left: 100px;
+  }
+  #cake:hover {
+    background-color: var(--cake-hover-bg);
+  }
+  #info {
+    margin-top: 30px;
+    min-height: 60px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  #restart-btn, #eat-cake-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid var(--text-color);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    display: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  #restart-btn:hover, #eat-cake-btn:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+  }
+</style>
+</head>
+<body>
+  <h1>Selamat Ulang Tahun !!!</h1>
+  <p>Coba ambil kuenya, tapi gak semudah itu!</p>
+
+  <div id="game-area" aria-label="Area permainan">
+    <div id="cake" role="button" aria-pressed="false" tabindex="0" title="Klik aku, kalau bisa!">🍰</div>
+  </div>
+
+  <div id="info"></div>
+  <button id="restart-btn">Main Lagi</button>
+  <button id="eat-cake-btn" title="Potong atau makan kue">Potong / Makan Kue</button>
+
+<script>
+  const cake = document.getElementById('cake');
+  const gameArea = document.getElementById('game-area');
+  const info = document.getElementById('info');
+  const restartBtn = document.getElementById('restart-btn');
+  const eatCakeBtn = document.getElementById('eat-cake-btn');
+
+  const maxAttempts = 7;
+  let attempts = 0;
+  let gameEnded = false;
+  let cakeEaten = false;
+
+  function randomPosition() {
+    const maxX = gameArea.clientWidth - cake.clientWidth;
+    const maxY = gameArea.clientHeight - cake.clientHeight;
+    const x = Math.floor(Math.random() * maxX);
+    const y = Math.floor(Math.random() * maxY);
+    return { x, y };
+  }
+
+  function moveCake() {
+    const { x, y } = randomPosition();
+    cake.style.left = x + 'px';
+    cake.style.top = y + 'px';
+  }
+
+  function onCakeClick() {
+    if(gameEnded) return;
+    attempts++;
+    if (attempts < maxAttempts) {
+      let teaseMessages = [
+        'Uh-uh, sudah ku bilang tidak semudah itu!',
+        'Coba lagi, lebih lincah kue nya ini mah!',
+        'hampir, tapi masih belum ges!',
+        'jiakh lepas lagi! Seriusan deh!',
+        'Nambah lagi kisah gagal menangkap kue.',
+        'Masih belum waktunya dapet kok.',
+        'Gak bakal gampang dapet kuenya kok!'
+      ];
+      info.textContent = teaseMessages[attempts - 1];
+      moveCake();
+    } else {
+      gameEnded = true;
+      info.textContent = "Hahaha! Setelah 7 kali coba, akhir nya masih belum ketangkep!. Selamat ulang tahun ges, Doa yang terbaik buat yang ulang tahun dari si pembuat hhe! 🎉, Apakah butuh kado?:v";
+      restartBtn.style.display = 'inline-block';
+      eatCakeBtn.style.display = 'inline-block';
+    }
+  }
+
+  function restartGame() {
+    attempts = 0;
+    gameEnded = false;
+    cakeEaten = false;
+    info.textContent = '';
+    restartBtn.style.display = 'none';
+    eatCakeBtn.style.display = 'none';
+    cake.style.left = '100px';
+    cake.style.top = '100px';
+    cake.textContent = '🍰';
+    cake.style.backgroundColor = 'var(--cake-bg)';
+    cake.style.transform = 'none';
+    cake.title = 'Klik aku, kalau bisa!';
+  }
+
+  function eatCake() {
+    if (cakeEaten) return;
+    cakeEaten = true;
+    info.textContent = "Sepertinya Lapar wkwkwkwkw 🎂";
+    cake.textContent = '🍴';
+    cake.style.backgroundColor = '#8b4513'; // brown to simulate eaten cake plate
+    cake.style.transform = 'scale(0.8) rotate(-20deg)';
+    cake.title = 'Yeay dah dimakan';
+    eatCakeBtn.style.display = 'none';
+  }
+
+  cake.addEventListener('click', onCakeClick);
+  restartBtn.addEventListener('click', restartGame);
+  eatCakeBtn.addEventListener('click', eatCake);
+
+  // Keyboard accessibility
+  cake.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!gameEnded) onCakeClick();
+    }
+  });
+</script>
+</body>
+</html>
+
